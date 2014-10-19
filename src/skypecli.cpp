@@ -16,12 +16,12 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ********************************************************************************/
+#include "libskype.h"
 
 #include <unistd.h>
+#include <stdlib.h>
 
 #include <iostream>
-
-#include "libskype.h"
 
 using namespace std;
 
@@ -36,19 +36,61 @@ public:
 };
 
 
+void print_usage() {
+	cout << "Usage: skypecli <options>               " << endl;
+	cout << "  -c <contact>  - Call contact          " << endl;
+	cout << "  -f <file>     - Send file to a contact" << endl;
+	exit(EXIT_FAILURE);
+}
 
 
-int main() {
+int main(int argc, char* const argv[]) {
+	int opt;
+	string call_handle;
+	string send_file;
+
+	while ((opt = getopt(argc, argv, "c:f:h")) != -1) {
+		switch (opt) {
+			case 'c':
+				call_handle = optarg;
+				break;
+			case 'f':
+				send_file = optarg;
+				break;
+			default:
+				print_usage();
+		}
+	}
+
+	if (argc < 2)
+		print_usage();
+
 	MyCallbacks callbacks;
 	LibSkype skype;
 	skype.set_handler(&callbacks);
 
-//	LibSkypeContact* contact =  skype.get_contact("testuser");
-//	cout << contact->handle() << endl;
-//	contact->transfer_file("uhadada.mp3");
-//	contact->send_message("uhadada.mp3");
-//	contact->call();
-//	usleep(100000);
-	while (1)
-		usleep(1000000);
+	if (!call_handle.empty()) {
+		LibSkypeContact* contact = skype.get_contact(call_handle);
+		if (!contact) {
+			cout << "Error, no such contact" << endl;
+			exit(EXIT_FAILURE);
+		}
+		cout << "Calling " << contact->handle() << endl;
+		contact->call();
+	} else
+	if (!send_file.empty()) {
+		string handle;
+		cout << "Send file to: " << flush;
+		getline(cin, handle);
+		LibSkypeContact* contact = skype.get_contact(handle);
+		if (!contact) {
+			cout << "Error, no such contact" << endl;
+			exit(EXIT_FAILURE);
+		}
+		cout << "Sending file to " << contact->handle() << endl;
+		contact->transfer_file(send_file);
+
+	}
+
+	exit(EXIT_SUCCESS);
 }
