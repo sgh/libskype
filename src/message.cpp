@@ -76,7 +76,7 @@ void LibSkypeMessage::message_handler(const string& message) {
 			_connection->api_message(ss.str());
 		}
 	} else
-		if (cmd == "BODY") {
+	if (cmd == "BODY") {
 		_body = token.remaining();
 		_initialized = true;
 	} else
