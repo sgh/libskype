@@ -42,7 +42,7 @@ void LibSkypeChat::message_handler(const string& message) {
 	if (cmd == "ACTIVITY_TIMESTAMP") {
 		stringstream ss;
 		_activity_timestamp = atoi(token.next().c_str());
-		cout << "Chat " << _id << " timestamp is now " << _activity_timestamp << endl;
+//		cout << "Chat " << _id << " timestamp is now " << _activity_timestamp << endl;
 		if (_initialized) {
 			ss << "GET CHAT " << _id << " RECENTCHATMESSAGES";
 			_connection->api_message(ss.str());
@@ -59,7 +59,7 @@ void LibSkypeChat::message_handler(const string& message) {
 			unsigned int messageid = atoi(messages[idx].c_str());
 			if (messageid <= _connection->get_max_message_id())
 				continue;
-			cout << "Max id is " << _connection->get_max_message_id() <<  ": Fetching message ID " << messageid << endl;
+//			cout << "Max id is " << _connection->get_max_message_id() <<  ": Fetching message ID " << messageid << endl;
 			if (messageid > max)
 				max = messageid;
 			ss.str("");

@@ -80,7 +80,7 @@ SkypeConnectionDBusConnection::SkypeConnectionDBusConnection(LibSkype_internals*
 	if (!_bus)
 		printf("Err: %s: %s\n", error.name, error.message);
 
-	printf("unique name: %s\n", dbus_bus_get_unique_name(_bus));
+//	printf("unique name: %s\n", dbus_bus_get_unique_name(_bus));
 	dbus_bus_add_match (_bus, "path='/com/Skype/Client'", &error);
 	dbus_connection_add_filter (_bus, signal_filter, this, NULL);
 	pthread_create(&tid, NULL, eventloop_jump, this);

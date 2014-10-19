@@ -153,7 +153,7 @@ void LibSkype_internals::message_handler(const string& message) {
 			if (chats[id] == NULL)
 				chats[id] = new LibSkypeChat(this,id);
 		}
-		cout << chats.size() << " chats received" << endl;
+//		cout << chats.size() << " chats received" << endl;
 	} else
 	if (cmd == "CHATMESSAGE") {
 		unsigned int messageid = atoi(token.next().c_str());
@@ -168,8 +168,9 @@ void LibSkype_internals::message_handler(const string& message) {
 	if (cmd == "CONNSTATUS") {
 	} else
 	if (cmd == "PROTOCOL") {
-	} else
-		cout << "Global handler - unhandled message:  " << message << endl;
+	}
+//	else
+//		cout << "Global handler - unhandled message:  " << message << endl;
 
 	pthread_mutex_unlock(&lock);
 	pthread_cond_broadcast(&cond);
@@ -181,7 +182,7 @@ void LibSkype_internals::dispatch_events() {
 	if (!message_dispatch_q.empty()) {
 		LibSkypeMessage* msg = message_dispatch_q.front();
 		if (msg->valid()) {
-			cout << "Valid message found. Dispatching." << endl;
+//			cout << "Valid message found. Dispatching." << endl;
 			message_dispatch_q.pop();
 			handler->message_received(msg);
 		}

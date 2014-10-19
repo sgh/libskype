@@ -70,7 +70,7 @@ public:
 	void update_max_message_id(unsigned long id) {
 		if (_maxmessageid < id) {
 			_maxmessageid = id;
-			cout << "Max message id is " << get_max_message_id() << endl;
+//			cout << "Max message id is " << get_max_message_id() << endl;
 		}
 	}
 
