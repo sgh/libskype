@@ -113,11 +113,6 @@ void* SkypeConnectionDBusConnection::eventloop_jump(void* arg) {
 }
 
 
-void SkypeConnectionDBusConnection::message_handler(const string& message) {
-	_connection->message_handler(message);
-}
-
-
 void* SkypeConnectionDBusConnection::eventloop(void* arg) {
 	(void)arg;
 	while (1) {
@@ -132,9 +127,10 @@ void* SkypeConnectionDBusConnection::eventloop(void* arg) {
 				cout << "Missed messages !!! " << endl;
 				exit(42);
 			}
-			message_handler(_response);
+			_connection->message_handler(_response);
 			seq = _sequence;
 		}
+		_connection->dispatch_events();
 		pthread_setcancelstate(1, NULL);
 	}
 }

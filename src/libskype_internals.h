@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <map>
+#include <queue>
 #include <string>
 
 using namespace std;
@@ -58,6 +59,10 @@ class SkypeMessageMap : public SkypeListMap<unsigned int, LibSkypeMessage*> {
 class LibSkype_internals {
 public:
 
+	LibSkype_internals() {
+		handler = NULL;
+	}
+
 	void api_message(const std::string& message) {
 		dbus->send_string(message);
 	}
@@ -75,6 +80,20 @@ public:
 		return _maxmessageid;
 	}
 
+	LibSkypeMessage* get_message(unsigned int messageid) {
+		LibSkypeMessage* msg;
+		SkypeMessageMap::iterator it = messages.find(messageid);
+		if (it == messages.end()) {
+			messages[messageid] = msg = new  LibSkypeMessage(this, messageid);
+			message_dispatch_q.push(msg);
+		} else
+			msg = it->second;
+
+		return msg;
+	}
+
+	void dispatch_events();
+
 	SkypeConnectionDBusConnection* dbus;
 	SkypeContactMap contacts;
 	SkypeMessageMap messages;
@@ -84,6 +103,9 @@ public:
 	int skype_version;
 	pthread_cond_t cond;
 	pthread_mutex_t lock;
+	LibSkypeHandler* handler;
+
+	queue<LibSkypeMessage*> message_dispatch_q;
 
 private:
 	unsigned long _maxmessageid;

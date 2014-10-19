@@ -25,9 +25,23 @@
 
 using namespace std;
 
-int main() {
+class MyCallbacks : public LibSkypeHandler {
 
+public:
+	void message_received(LibSkypeMessage* msg) {
+		cout << "New message received" << endl;
+		if (msg->editable() && msg->body() == "ping")
+			msg->set_body("pong");
+	}
+};
+
+
+
+
+int main() {
+	MyCallbacks callbacks;
 	LibSkype skype;
+	skype.set_handler(&callbacks);
 
 //	LibSkypeContact* contact =  skype.get_contact("testuser");
 //	cout << contact->handle() << endl;
@@ -35,6 +49,6 @@ int main() {
 //	contact->send_message("uhadada.mp3");
 //	contact->call();
 //	usleep(100000);
-//	while (1)
-//		usleep(1000000);
+	while (1)
+		usleep(1000000);
 }

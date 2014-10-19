@@ -25,11 +25,19 @@
 
 class LibSkype_internals;
 class LibSkypeContact;
+class LibSkypeMessage;
+class LibSkypeHandler;
 
 class LibSkype {
 public:
 	LibSkype();
 	virtual ~LibSkype();
+
+	/**
+	 * @brief Set object to get event from libskype.
+	 * @param handler A pointer to  a LibSkypeHandler derived class
+	 */
+	void set_handler(LibSkypeHandler* handler);
 
 	/**
 	 * @brief Get a pointer to a skype contact
@@ -38,11 +46,18 @@ public:
 	 */
 	LibSkypeContact* get_contact(const std::string& name);
 
+	std::string current_user_handle();
 
 private:
 	LibSkype_internals* _d;
 };
 
+
+
+class LibSkypeHandler {
+public:
+	virtual void message_received(LibSkypeMessage* msg) = 0;
+};
 
 
 
@@ -75,8 +90,11 @@ class LibSkypeMessage {
 public:
 	LibSkypeMessage(LibSkype_internals* connection, unsigned int id);
 
+	std::string body() const;
 	void set_body(const std::string& body);
 	void message_handler(const std::string& message);
+	bool valid() const;
+	bool editable();
 
 private:
 	std::string _body;

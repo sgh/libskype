@@ -62,6 +62,11 @@ LibSkype::~LibSkype() {
 }
 
 
+void LibSkype::set_handler(LibSkypeHandler* handler) {
+	_d->handler = handler;
+}
+
+
 LibSkypeContact* LibSkype::get_contact(const string& name) {
 	std::map<std::string, LibSkypeContact*>::iterator it = _d->contacts.begin();
 
@@ -93,6 +98,10 @@ LibSkypeContact* LibSkype::get_contact(const string& name) {
 
 	// If nothin matched just return NULL
 	return NULL;
+}
+
+string LibSkype::current_user_handle() {
+	return _d->current_user_handle;
 }
 
 
@@ -148,10 +157,8 @@ void LibSkype_internals::message_handler(const string& message) {
 	} else
 	if (cmd == "CHATMESSAGE") {
 		unsigned int messageid = atoi(token.next().c_str());
-		if (messages.find(messageid) == messages.end())
-			if (messages[messageid] == NULL)
-			messages[messageid] = new  LibSkypeMessage(this, messageid);
-		messages[messageid]->message_handler(token.remaining());
+		LibSkypeMessage* msg = get_message(messageid);
+		msg->message_handler(token.remaining());
 	} else
 	if (cmd == "CHATMESSAGES") {
 		update_max_message_id( atoi(token.next().c_str()) );
@@ -166,4 +173,17 @@ void LibSkype_internals::message_handler(const string& message) {
 
 	pthread_mutex_unlock(&lock);
 	pthread_cond_broadcast(&cond);
+}
+
+
+void LibSkype_internals::dispatch_events() {
+	// Dispatch new messages
+	if (!message_dispatch_q.empty()) {
+		LibSkypeMessage* msg = message_dispatch_q.front();
+		if (msg->valid()) {
+			cout << "Valid message found. Dispatching." << endl;
+			message_dispatch_q.pop();
+			handler->message_received(msg);
+		}
+	}
 }

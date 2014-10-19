@@ -36,6 +36,11 @@ LibSkypeMessage::LibSkypeMessage(LibSkype_internals* connection, unsigned int id
 }
 
 
+string LibSkypeMessage::body() const {
+	return _body;
+}
+
+
 void LibSkypeMessage::set_body(const string& body) {
 	stringstream ss;
 	ss << "SET CHATMESSAGE " << _id << " BODY " << body;
@@ -54,13 +59,6 @@ void LibSkypeMessage::message_handler(const string& message) {
 			_connection->api_message(ss.str());
 		}
 	} else
-	if (cmd == "BODY") {
-		_body = token.remaining();
-		cout << "Chatname : " << _chatid << endl;
-		cout << "From   :   " << _from << endl;
-		cout << "Message: " << _body << endl;
-		_initialized = true;
-	} else
 	if (cmd == "FROM_HANDLE") {
 		_from = token.remaining();
 		if (!_initialized) {
@@ -72,21 +70,25 @@ void LibSkypeMessage::message_handler(const string& message) {
 	if (cmd == "CHATNAME") {
 		_chatid = token.remaining();
 
-//		if (_body == "ping") {
-//			stringstream ss;
-//			ss << "CHATMESSAGE " << chatid << " pong";
-//			_connection->sendmessage(ss.str());
-//		}
 		if (!_initialized) {
 			stringstream ss;
 			ss << "GET CHATMESSAGE " << _id << " BODY";
 			_connection->api_message(ss.str());
 		}
 	} else
+		if (cmd == "BODY") {
+		_body = token.remaining();
+		_initialized = true;
+	} else
 		cout << "SkypeMessage handler - unhandled message:  " << message << endl;
 
 }
 
 
+bool LibSkypeMessage::valid() const {
+	return _initialized;
+}
 
-
+bool LibSkypeMessage::editable() {
+	return (_from == _connection->current_user_handle);
+}

@@ -37,8 +37,6 @@ public:
 
 	static void* eventloop_jump(void* arg);
 
-	void message_handler(const std::string& message);
-
 private:
 	LibSkype_internals* _connection;
 	unsigned int _sequence;
