@@ -59,6 +59,7 @@ LibSkype::LibSkype() {
 
 LibSkype::~LibSkype() {
 	delete _d->dbus;
+	delete _d;
 }
 
 

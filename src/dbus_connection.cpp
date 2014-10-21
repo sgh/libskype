@@ -73,9 +73,9 @@ DBusHandlerResult SkypeConnectionDBusConnection::signal_filter (DBusConnection *
 
 SkypeConnectionDBusConnection::SkypeConnectionDBusConnection(LibSkype_internals* connection) {
 	DBusError error;
+	dbus_threads_init_default();
 	dbus_error_init (&error);
 	_bus = dbus_bus_get(DBUS_BUS_SESSION, &error);
-	pthread_mutex_init(&_lock, NULL);
 	_connection = connection;
 	if (!_bus)
 		printf("Err: %s: %s\n", error.name, error.message);
@@ -89,6 +89,7 @@ SkypeConnectionDBusConnection::SkypeConnectionDBusConnection(LibSkype_internals*
 
 SkypeConnectionDBusConnection::~SkypeConnectionDBusConnection() {
 	void* retval;
+	dbus_connection_flush(_bus);
 	pthread_cancel(tid);
 	pthread_join(tid, &retval);
 }
@@ -100,9 +101,7 @@ void SkypeConnectionDBusConnection::send_string(const string& str) {
 //	cout << "Command: " << ss.str() << endl;
 	message = dbus_message_new_method_call("com.Skype.API", "/com/Skype", "com.Skype.API", "Invoke");
 	dbus_message_append_args (message, DBUS_TYPE_STRING, &command, DBUS_TYPE_INVALID);
-	pthread_mutex_lock(&_lock);
 	dbus_connection_send(_bus, message, NULL);
-	pthread_mutex_unlock(&_lock);
 	dbus_message_unref (message);
 }
 
@@ -118,10 +117,7 @@ void* SkypeConnectionDBusConnection::eventloop(void* arg) {
 	while (1) {
 		unsigned int seq = _sequence;
 		pthread_setcancelstate(0, NULL);
-
-		pthread_mutex_lock(&_lock);
 		dbus_connection_read_write_dispatch(_bus, 100);
-		pthread_mutex_unlock(&_lock);
 		if (seq != _sequence) {
 			if (_sequence - seq > 1) {
 				cout << "Missed messages !!! " << endl;

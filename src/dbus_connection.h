@@ -26,7 +26,6 @@ class LibSkype_internals;
 
 class SkypeConnectionDBusConnection {
 public:
-	pthread_mutex_t _lock;
 	std::string _response;
 
 	DBusConnection* _bus;
