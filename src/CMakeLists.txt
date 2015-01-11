@@ -13,8 +13,8 @@ set(LIBSOURCES ${LIBSOURCES}
 	)
 
 
-add_library(libskype SHARED ${LIBSOURCES})
+add_library(skype SHARED ${LIBSOURCES})
 
 add_executable(skypecli skypecli.cpp)
-target_link_libraries(skypecli libskype)
+target_link_libraries(skypecli skype)
 
