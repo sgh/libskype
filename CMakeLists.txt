@@ -5,8 +5,10 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
 
-list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra")
-list(APPEND CMAKE_C_FLAGS "-Wall -Wextra")
+if(CMAKE_COMPILER_IS_GNUCXX)
+	list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra")
+	list(APPEND CMAKE_C_FLAGS "-Wall -Wextra")
+endif()
 
 find_package(PkgConfig)
 
