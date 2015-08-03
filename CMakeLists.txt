@@ -11,7 +11,7 @@ list(APPEND CMAKE_C_FLAGS "-Wall -Wextra")
 find_package(PkgConfig)
 
 ## Find dbus-1
-pkg_check_modules(PC_DBUS dbus-1)
+pkg_check_modules(PC_DBUS dbus-1 REQUIRED)
 include_directories( ${PC_DBUS_INCLUDE_DIRS} )
 link_libraries( ${PC_DBUS_LIBRARIES} )
 
